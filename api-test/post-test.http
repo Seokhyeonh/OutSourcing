@@ -1,0 +1,142 @@
+@adminUsername = admin1234
+@adminEmail = admin123@email.com
+@admincode = WkdWMlpXNTBaWElnYzNWd1pYSWdZV1J0YVc0Z1kyOWtaUT0
+@password1 = Abcdef12345!
+@nickname2 = second_name
+@post_id = 3
+@comment_id = 1
+@title = 제목
+@content = 내용테스트
+
+@categoryid = 1
+@categoryTopic = Web
+@username = testuser99
+@password = Password123!
+@nickname = 닉네임1
+@email = test9@example.com
+
+
+# 일반권한인 유저 테스트입니다.
+
+### 유저 회원 가입
+POST http://localhost:8080/auth/sign-up
+Content-Type: application/json
+
+{
+  "username":"{{username}}",
+  "password":"{{password}}",
+  "nickname":"{{nickname}}",
+  "email":"{{email}}"
+}
+### 어드민 유저 회원가입
+POST http://localhost:8080/auth/sign-up
+Content-Type: application/json
+
+{
+  "username":"{{adminUsername}}",
+  "password":"{{password1}}",
+  "nickname":"{{nickname2}}",
+  "email":"{{adminEmail}}",
+  "adminStatus": true,
+  "adminCode": "{{admincode}}"
+
+}
+###  로그인
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {%
+    client.global.set("Authorization", response.headers.valueOf("Authorization"));
+    client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
+%}
+
+
+###  게시글 작성
+POST http://localhost:8080/posts
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "title": "{{title}}",
+  "content": "{{content}}",
+  "categoryTopic": "{{categoryTopic}}"
+
+}
+
+###  단일 게시글 조회
+GET http://localhost:8080/posts/{{post_id}}
+Content-Type: application/json
+
+###  전체 게시글 조회
+GET http://localhost:8080/posts
+Content-Type: application/json
+
+###  카테고리 별 게시글 조회
+GET http://localhost:8080/posts?category={{categoryid}}
+Content-Type: application/json
+
+### 게시글 수정
+PUT http://localhost:8080/posts/{{post_id}}
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "title": "제목수정하기",
+  "content": "내용수정하기",
+  "categoryTopic": "Mobile"
+}
+
+### 게시글 삭제
+DELETE http://localhost:8080/posts/{{post_id}}
+Authorization: {{Authorization}}
+
+### 어드민 유저 로그인 (로그인 요청시 억세스토큰, 리플레시토큰 자동 저장 후 다른곳에서 가져다 쓸수 있습니다)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username":"{{adminUsername}}",
+  "password":"{{password1}}"
+}
+
+> {%
+    client.global.set("Authorization", response.headers.valueOf("Authorization"));
+    client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
+%}
+### 공지글 생성
+PUT http://localhost:8080/admin/posts/{{post_id}}/notice
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "title": "공지",
+  "content": "내용 테스트입니다.",
+  "categoryTopic": "Web"
+}
+###공지글 수정
+PUT http://localhost:8080/admin/posts/{{post_id}}
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "title": "공지글 수정하기",
+  "content": "수정된 공지글",
+  "categoryTopic": "Web"
+}
+###어드민 권한으로 게시판 삭제
+DELETE http://localhost:8080/admin/posts/{{post_id}}
+Authorization: {{Authorization}}
+
+###카테고리 이동
+PUT http://localhost:8080/admin/posts/{{post_id}}
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "categoryTopic": "Mobile"
+}

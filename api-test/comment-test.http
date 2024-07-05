@@ -1,0 +1,118 @@
+## Variables
+@username = user2345
+@adminUsername = admin1234
+
+@password1 = Abcdef12345!
+@password2 = asdgfA123@42
+@password3 = Ewwqas@12341
+@password4 = dqwmmdsi@rt15
+@password5 = test2T@#%
+@password6 = 123kfuiAsd@$%
+
+@content = 시큐리티 힘들다..5
+@edit_content = edit 시큐리티 힘들다..33
+@admin_edit_content = 1113admin edit 시큐리티 힘들다..33
+@post_id = 1
+
+@title = 제목3
+@id = 1
+
+@categoryTopic = 백엔드
+###  로그인
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password1}}"
+}
+
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+%}
+
+###  관리자 로그인
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{adminUsername}}",
+  "password": "{{password1}}"
+}
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+%}
+
+### 유저 로그아웃
+POST http://localhost:8080/auth/logout
+Authorization:{{Authorization}}
+
+### 게시글 댓글 조회
+GET http://localhost:8080/posts/1
+Content-Type: application/json
+
+
+### 댓글 작성
+POST http://localhost:8080/comments
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "postId": "{{post_id}}",
+  "content": "{{content}}"
+}
+
+
+
+### 댓글 수정
+PUT http://localhost:8080/comments/1
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "postId": {{post_id}},
+  "content": "{{edit_content}}"
+}
+
+
+### 댓글 삭제
+DELETE http://localhost:8080/comments/4
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+### 게시글 작성
+POST http://localhost:8080/posts
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "title": "{{title}}",
+  "content": "{{content}}",
+  "categoryTopic": "{{categoryTopic}}"
+}
+
+
+### 관리자 댓글 수정
+PUT http://localhost:8080/admin/comments/2
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "postId": {{post_id}},
+  "content": "{{admin_edit_content}}"
+}
+
+### 관리자 댓글 삭제
+DELETE http://localhost:8080/admin/comments/1
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+### 좋아요 테스트
+POST http://localhost:8080/likes?contentType=post&contentId=1
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+### 스크랩 테스트
+POST http://localhost:8080/scraps/posts/3
+Authorization:{{Authorization}}
+Content-Type: application/json

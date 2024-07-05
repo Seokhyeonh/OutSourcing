@@ -1,0 +1,240 @@
+## 테스트에서 쓸 값들 미리 지정
+@username = user2345
+@adminUsername = admin1234
+
+@password1 = Abcdef12345!
+@password2 = asdgfA123@42
+@password3 = Ewwqas@12341
+@password4 = dqwmmdsi@rt15
+
+@nickname1 = first_name
+@nickname2 = second_name
+
+@updateNickname = update_test
+
+@email = user123@email.com
+@adminEmail = admin123@email.com
+
+@updateEmail = update123@email.com
+
+@userId = 1
+
+@postId = 1
+
+@commentId = 1
+
+@categoryId = 1
+
+@categoryTopic = 백엔드
+
+@admincode = WkdWMlpXNTBaWElnYzNWd1pYSWdZV1J0YVc0Z1kyOWtaUT09
+
+# 어드민 권한만 접근할 수 있는 코드 테스트
+
+
+### 어드민 유저 로그인 (로그인 요청시 억세스토큰, 리플레시토큰 자동 저장 후 다른곳에서 가져다 쓸수 있습니다)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username":"{{adminUsername}}",
+  "password":"{{password1}}"
+}
+
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
+%}
+
+
+### 일반 유저 로그인 (로그인 요청시 억세스토큰, 리플레시토큰 자동 저장 후 다른곳에서 가져다 쓸수 있습니다)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username":"{{username}}",
+  "password":"{{password1}}"
+}
+
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
+%}
+
+
+### (관리자) 카테고리 추가
+POST http://localhost:8080/categories
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "topic": "{{categoryTopic}}"
+}
+
+
+### (관리자) 카테고리 조회
+GET http://localhost:8080/categories
+Authorization: {{Authorization}}
+
+
+### (관리자) 카테고리 수정
+PUT http://localhost:8080/categories/{{categoryId}}}}
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "topic": "수정된카테고리"
+}
+
+
+### (관리자) 카데고리 삭제
+DELETE http://localhost:8080/categories/{{categoryId}}
+Authorization: {{Authorization}}
+
+
+### (관리자) 서비스 이용자들 전체 목록 조회
+GET http://localhost:8080/admin/users
+Authorization: {{Authorization}}
+
+
+### (관리자) 일반 사용자를 관리자 권한으로 변경
+PUT http://localhost:8080/admin/users/{{userId}}/role
+Authorization: {{Authorization}}
+
+
+### (관리자) 사용자 닉네임 수정
+PUT http://localhost:8080/admin/users/{{userId}}/nickname
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "newNickname": "{{updateNickname}}"
+}
+
+
+### (관리자) 사용자 차단
+PUT http://localhost:8080/admin/users/{{userId}}/block
+Authorization: {{Authorization}}
+
+
+### (관리자) 사용자 활성화
+PUT http://localhost:8080/admin/users/{{userId}}/activate
+Authorization: {{Authorization}}
+
+
+### (관리자) 사용자 삭제
+PUT http://localhost:8080/admin/users/{{userId}}/delete
+Authorization: {{Authorization}}
+
+
+### (관리자) 공지글 등록
+PUT http://localhost:8080/admin/posts/notice
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "title": "게시글 제목",
+  "content": "게시글 내용",
+  "categoryTopic": "{{categoryTopic}}"
+}
+
+
+### (관리자) 공지글 수정
+PUT http://localhost:8080/admin/posts/notice/2
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "title": "수정된 제목",
+  "content": "수정된 내용"
+}
+
+
+### (관리자) 게시물 삭제 (x)
+DELETE http://localhost:8080/admin/posts/1
+Authorization: {{Authorization}}
+
+
+### (관리자) 댓글 수정
+PUT http://localhost:8080/admin/comments/{{commentId}}
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "postId": "{{postId}}",
+  "content": "수정된 내용"
+}
+
+
+### (관리자) 댓글 삭제
+DELETE http://localhost:8080/admin/comments/{{commentId}}
+Authorization: {{Authorization}}
+
+
+### (관리자) 카테고리 이동
+PUT http://localhost:8080/admin/posts/{{postId}}
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "categoryTopic": "프론트"
+}
+
+
+### 게시글 단일 조회
+GET http://localhost:8080/posts/{{postId}}
+Authorization: {{Authorization}}
+
+
+### 전체 카테고리의 게시글 조회
+GET http://localhost:8080/posts
+
+
+### 카테고리의 게시글 조회
+GET http://localhost:8080/posts?category=1
+
+
+### 게시글 수정
+PUT http://localhost:8080/posts/{{postId}}
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "title": "수정된 게시글 제목",
+  "content": "수정된 게시글 내용",
+  "categoryTopic": "{{categoryTopic}}"
+}
+
+
+### 게시글 삭제
+DELETE http://localhost:8080/posts/{{postId}}
+Authorization: {{Authorization}}
+
+
+### 댓글 작성
+POST http://localhost:8080/comments
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "postId": {{postId}},
+  "content": "댓글 내용"
+}
+
+
+### 댓글 수정
+PUT http://localhost:8080/comments/{{postId}}
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "postId": {{postId}},
+  "content": "수정된 댓글내용"
+}
+
+### 댓글 삭제
+DELETE http://localhost:8080/comments/{{postId}}
+Authorization: {{Authorization}}
+
+
+
